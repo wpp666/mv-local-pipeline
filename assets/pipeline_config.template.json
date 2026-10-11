@@ -1,0 +1,46 @@
+{
+  "project_name": "归人",
+  "projects_dir": "f:\\",
+  "comfy_root": "F:\\comfyui\\ComfyUI_windows_portable-G314\\ComfyUI",
+  "server": "http://127.0.0.1:8188",
+  "models": {
+    "krea2_unet": "Krea2\\krea2_turbo_int8_convrot.safetensors",
+    "krea2_unet_fp8": "Krea2\\krea2_turbo_fp8_scaled.safetensors",
+    "krea2_clip": "qwen3vl_4b_fp8_scaled.safetensors",
+    "krea2_vae": "qwen_image_vae.safetensors",
+    "krea2_identity_lora": "Krea2-功能\\Krea2-编辑identity_edit_v1_2.safetensors",
+    "krea2_quadview_lora": "Krea2-功能\\Krea2-四视图QuadView_krea2_v1.safetensors",
+    "krea2_style_lora": "krea2_style_reference.safetensors",
+    "qwen_unet": "Qwen\\qwen_image_2.1_int8_convrot.safetensors",
+    "qwen_clip": "qwen3vl_8b_int8_convrot.safetensors",
+    "qwen_vae": "qwen_image_2.1_vae_bf16.safetensors",
+    "h3_unet": "Minimax_H3\\minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+    "h3_clip": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+    "h3_vae_video": "minimax_h3_video_vae_fp16.safetensors",
+    "h3_vae_audio": "minimax_h3_audio_vae_fp32.safetensors",
+    "h3_turbo_lora": "minimax_h3\\minimax_h3_fl2v_lightx2v_turbo_4step_v0.1_comfy.safetensors"
+  },
+  "mj_loras": [
+    ["Krea2-功能\\krea2小志_xm_k20_texture.safetensors", 0.6],
+    ["Krea2-功能\\krea2-Cc-MJ-风格滤镜.safetensors", 0.7],
+    ["Krea2-功能\\K2-MJ美学增强Afterlight_v1.safetensors", 0.5],
+    ["Krea2-功能\\krea2-Cc-MJ-影视柔光.safetensors", 0.6]
+  ],
+  "defaults": {
+    "still_w": 1376,
+    "still_h": 768,
+    "krea2_steps": 10,
+    "krea2_cfg": 1.0,
+    "edit_steps": 10,
+    "img2img_denoise": 0.35,
+    "sheet_steps": 10,
+    "qwen_steps": 30,
+    "qwen_resolution": 1024,
+    "h3_megapixels": 0.2,
+    "h3_aspect": "16:9",
+    "h3_steps": 4,
+    "h3_scheduler": "simple",
+    "h3_sampler": "res_multistep",
+    "h3_turbo_strength": 0.75
+  }
+}
