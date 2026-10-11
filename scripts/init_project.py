@@ -30,6 +30,8 @@ SUBDIRS = [
     "production/storyboards_2pass",
     "production/storyboards_grid",
     "production/h3_videos",
+    "production/lyrics",
+    "delivery",
 ]
 
 
@@ -76,6 +78,9 @@ def main():
     (prod / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    lyric_tpl = SKILL_DIR / "assets" / "lyrics.template.json"
+    shutil.copyfile(lyric_tpl, prod / "lyrics" / "lyrics.json")
+
     print(f"工程根：{root}")
     print(f"已复制脚本 {copied} 个 -> {prod}")
     print("下一步：")
@@ -84,6 +89,8 @@ def main():
     print("  2) 写 manifest.json 的 tasks（id/duration_seconds/images_in_order/audio/prompt）")
     print("  3) 分镜两遍：run_qwen21_edit.py --all → run_krea2_img2img.py --denoise 0.35 <ids>")
     print("  4) 出视频：run_h3_video.py <ids> --megapixels 0.2 --aspect 16:9 --resume")
+    print("  5) 拼成片：make_master.py --out ../delivery/master_noLyrics.mp4")
+    print("  6) 字幕：改 lyrics/lyrics.json → make_lyrics_ass.py → make_master.py --ass lyrics/master.ass")
 
 
 if __name__ == "__main__":

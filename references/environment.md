@@ -10,7 +10,19 @@ Machine facts this pipeline is tuned for. Reload this file whenever ComfyUI, a m
 | CPU / RAM | i5-12400F / 32 GB |
 | ComfyUI | `F:\comfyui\ComfyUI_windows_portable-G314\ComfyUI`, served at `http://127.0.0.1:8188` |
 | Python | `F:\comfyui\ComfyUI_windows_portable-G314\python_embeded\python.exe` — the system `python` does not respond, never use it |
+| ffmpeg | `F:\comfyui\ComfyUI_windows_portable-G314\ffmpeg-8.0.1-full_build\bin\ffmpeg.exe`, i.e. a full build sitting beside the ComfyUI root; `make_master.py` finds it from `comfy_root.parent` |
 | Acceleration | `triton 3.7.1` and `sageattention` are installed |
+
+## Subtitle fonts
+
+libass resolves font families by name off `C:\Windows\Fonts`. Both families below were verified by burning a frame and looking at it.
+
+| Role | Family | File |
+| --- | --- | --- |
+| Chinese lyric, title | `KaiTi` | `simkai.ttf` |
+| Latin lyric, credit | `Georgia` | `georgia.ttf` |
+
+Do not put Chinese and Latin on one line in one style if the look matters: the Latin serif is what makes the small second line read as a translation rather than as more subtitle.
 
 Verify the server before a batch:
 

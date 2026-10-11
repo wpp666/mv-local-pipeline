@@ -1,0 +1,20 @@
+{
+  "_note": "MV 字幕的唯一数据源。lines 的时间来自母版音乐事实（小节网格 / 换气点），不要凭感觉填。en 可留空则只出中文。",
+  "title": "灯火归人",
+  "title_en": "Lamplight for the Returning One",
+  "credit": "Music & Lyrics: LLMuse",
+  "director": "Director LLMuse",
+  "year": "2026",
+  "timing": {
+    "title_in": 2.5,
+    "title_en_in": 3.2,
+    "sub_in": 4.0,
+    "title_out": 12.5,
+    "credit_in": 152.6,
+    "credit_out": 159.4
+  },
+  "lines": [
+    { "start": 27.429, "end": 34.286, "cn": "第一句歌词", "en": "First line of the lyric" },
+    { "start": 34.286, "end": 41.143, "cn": "第二句歌词", "en": "Second line of the lyric" }
+  ]
+}

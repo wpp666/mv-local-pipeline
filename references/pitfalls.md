@@ -18,6 +18,12 @@ Every entry below actually happened on this project. Check them before accepting
 | 12 | Tried to lift one view out of a QuadView sheet | QuadView only goes single image to multi view, it is not reversible | Split the sheet into separate files by hand |
 | 13 | The editor crashes while loading big weights | 8 GB card | Generate through the scripts; never load the H3 weights in the editor |
 | 14 | Anchor rooms come out narrow and fake | No space scale in the prompt | State width, depth, and ceiling height |
+| 15 | The finished cut runs long and every boundary drifts | H3 snaps frames up to the `17k+5` grid, so each segment file is longer than its integer `duration_seconds` | Trim every segment to `duration_seconds` before concatenating; never concat the raw files |
+| 16 | Picture and music drift apart a few segments in | Concatenating raw segments drags their own model-generated audio along | Drop segment audio entirely and mux the master WAV over the whole cut |
+| 17 | The `ass` filter errors out, or the subtitle silently never burns | A Windows drive colon, backslashes, and a non-ASCII folder all passed inside the filter string | Pass only the bare file name and run ffmpeg with `cwd` set to the subtitle folder |
+| 18 | Subtitles render as empty boxes | libass cannot find a CJK family by that name | Use an installed family name such as `KaiTi`, then sample a frame to confirm |
+| 19 | Chinese and English lines collide or drift apart | Both languages placed as two lines inside one event | Two events with the same in/out and separate `MarginV` |
+| 20 | The title or credit lands on a face | Positioned by habit without looking at the frame | Sample that frame first, then choose the top or the bottom band |
 
 ## Standing checks
 
@@ -26,4 +32,6 @@ Every entry below actually happened on this project. Check them before accepting
 - Pass 1 decides the people count; count the people before spending a pass 2.
 - Multi-person frames go through the Qwen multi-image pass.
 - After any asset change, re-run `fix_manifest_refs.py` and confirm `images_in_order` still matches the `<Picture N>` tags.
+- Trim to integer seconds before concat; never concat raw H3 segments.
+- After burning subtitles, sample frames at the title, a lyric line, and the credit, and look at them.
 - Report file paths as clickable links and let the user judge; do not rank candidates.
