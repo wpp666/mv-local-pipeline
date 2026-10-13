@@ -4,7 +4,7 @@ Four prompt families, one per generation step. Keep each family in its own langu
 
 Global rules:
 
-- Describe only what should be present. Exclusions belong in the negative prompt.
+- Describe only what should be present, and express exclusions in positive wording. Every pass runs `cfg` 1, where ComfyUI skips the negative conditioning, so a negative prompt does nothing.
 - State light direction and quality explicitly, and name the space scale (width, depth, ceiling height) when the prompt builds a room.
 - One action per shot.
 - No `(word:1.2)` weighting syntax and no keyword soup in Krea 2 prompts; repeat the subject at the head of the sentence instead.
@@ -34,21 +34,44 @@ Derived views (head close-up, back view) are image-to-image from the front full-
 
 ## 2. Storyboard pass 1 — Qwen-Image 2.1 multi-image edit
 
-Editing-instruction phrasing. This is the pass that decides content, framing, and how many people are in frame.
+One short placement instruction. This is the pass that decides content, framing, how many people are in frame, and their facing.
 
-- Label references as `[图1]`, `[图2]`, `[图3]`; state what each one supplies (scene anchor, character anchor, key frame).
-- State the head count explicitly and forbid duplication, for example 画面中只有一位人物，各人物只出现一次、不得重复.
-- List the features that must be preserved: face shape, hair, wardrobe, and the spatial relation between props.
-- Ask for a 16:9 horizontal frame.
-- Do not pin a seed; a fixed seed makes ComfyUI reuse a cached image.
+**The first reference decides the edit base and the output size.** Give `<image1>` the scene anchor, never a character. The node emits an empty latent at the *first* reference's own size, so a person as `<image1>` turns that person into the canvas: the model blows them up into a giant or drops them outright, and the frame inherits that anchor's aspect ratio.
 
-Template:
+Rules:
+
+- Label references `<image1>`, `<image2>`, … and order them scene → character full body → character head. The scene anchor is always `<image1>`.
+- Attach no prop anchors. A small-object anchor is inserted at its own close-up scale (an eraser came out the size of a lunchbox) and a size phrase in the prompt cannot shrink it. Describe small props in text with a size cue (拇指大小的半块橡皮) and an era cue where the era matters.
+- Prefer placing actions within reach of the subject's stated position. A limb action that must span a distance drags the whole scale with it.
+- Keep the prompt to one short instruction, roughly 40–80 characters: where to put whom, one facing, one scale reference. Do not restate the whole scene the way a text-to-image prompt would. Measured on this project, a 46-character instruction beat 106- and 153-character versions of the same frame — the extra conditions fight each other.
+- Fix facing with a visible anchor in the frame (the blackboard, the door, the window) or `back to camera`; never front / back / left / right / side.
+- Give position by screen side for a left/right layout (in the chair to the right of the desk), not with depth words such as behind the desk.
+- Keep pose and occlusion to the minimum needed, written positively; for a seated figure a long occlusion clause drags the facing off.
+- State one scale reference against the environment (head height against a chair back, prop length as a fraction of frame width) so the model cannot rescale freely.
+- Never write the aspect ratio into the prompt body. 16:9 comes from the reference images' own size; keep every reference at the same 16:9 aspect.
+- Express exclusions only in positive wording (see the global rules).
+- Do not pin the seed in production. For a controlled A/B run on a single frame, pin `--seed 42` so both candidates are comparable.
+
+Person-frame template:
 
 ```text
-[图1] 提供 <场景> 的空间与陈设，[图2] 提供 <人物> 的外观，[图3] 为构图关键帧。
-保持 <人物> 的脸型、发型、服装与 <道具> 的位置关系不变，画面中只有 <N> 位人物，各人物只出现一次、不得重复。
-<一句话编辑指令：要画面发生什么>。16:9 横构图。
+参考图（按数组顺序传入，编号即提示词里的 <imageN>；<image1> 为该帧主场景、也是被编辑图）：
+  <image1> = <场景锚图>
+  <image2> = <人物正面全身锚图>
+  <image3> = <人物头部锚图（如有）>
+
+提示词：
+把<image2>中的人物放进<image1>的<场景>，让他坐在<屏幕方位，如「靠窗那张桌子右面」>的椅子里、面向<画面里可见的锚点，如「左边的黑板」>；其余画面保持不变。
 ```
+
+Empty-scene frame: describe only what the space should show. With `cfg` 1 there is no functioning negative line, so a human-free frame is written purely from what the space contains — nothing about people at all.
+
+```text
+提示词：
+保持<image1>的<空间结构/陈设>，<光落在哪、有什么物件>；其余画面保持不变。
+```
+
+The runner takes the single line below `提示词：` as the prompt. It reads no negative list: at `cfg` 1 a negative prompt has no effect.
 
 ## 3. Storyboard pass 2 — Krea 2 image-to-image style pass
 

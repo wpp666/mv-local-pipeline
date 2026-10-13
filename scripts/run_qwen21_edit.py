@@ -13,6 +13,7 @@ import argparse
 import json
 import mimetypes
 import random
+import re
 import shutil
 import time
 import urllib.request
@@ -33,11 +34,16 @@ VAE = CFG.model("qwen_vae")
 
 
 def parse_prompt_file(path):
-    """返回 (refs[list[Path]], prompt[str])。"""
+    """返回 (refs[list[Path]], prompt[str])。
+
+    不解析负向提示词：本脚本固定 cfg=1.0，ComfyUI 在 cfg=1 时跳过负向条件计算，
+    负向词不起作用（见 references/pitfalls.md），提示词一律用正面写法表达排除。
+    """
     refs, prompt, lines = [], "", path.read_text(encoding="utf-8").splitlines()
     for i, ln in enumerate(lines):
         s = ln.strip()
-        if s.startswith("图") and "=" in s and s.split("=")[0].strip().rstrip(" =").startswith("图"):
+        # 参考图行：官方多图编辑的引用标记是 <imageN>；兼容旧写法「图N =」。
+        if re.match(r"^(?:图\s*\d+|<image\d+>)\s*=", s):
             p = s.split("=", 1)[1].strip()
             if p:
                 refs.append(Path(p))

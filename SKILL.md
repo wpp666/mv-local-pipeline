@@ -18,7 +18,7 @@ To run this same pipeline on a rented GPU cloud box instead of this machine, use
 - Lyric text and timings live only in `production/lyrics/lyrics.json`. Never hardcode a lyric line, a title, or a credit into a script.
 - Burn subtitles with the full-build `ffmpeg` found next to the ComfyUI root; route the `ass` filter through the script's cwd plus a bare file name so Windows colons, backslashes, and non-ASCII paths cannot break the filter string.
 - Report generated files as clickable `computer://` links and let the user judge quality. Never declare which candidate is better.
-- Describe only what should appear. Put exclusions in the negative prompt, not in the positive text.
+- Describe only what should appear, and express every exclusion in positive wording. All passes run `cfg` 1, and at `cfg` 1 ComfyUI skips the negative conditioning entirely, so a negative prompt has no effect.
 - Run generation through the scripts, not the ComfyUI editor. Loading the 20 GB H3 weights inside the editor crashes an 8 GB card.
 
 ## Project layout
@@ -33,7 +33,7 @@ To run this same pipeline on a rented GPU cloud box instead of this machine, use
    ├─ manifest.json              segment schedule, reference order, audio, prompt path
    ├─ anchor_prompts/            anchor prompt per file, one 提示词 line
    ├─ storyboard_prompts/        stage-2 pass-1 prompts
-   ├─ krea2_edit_prompts/        stage-2 pass-2 prompts
+   ├─ krea2_style_prompts/       stage-2 pass-2 prompts
    ├─ prompts_h3/                stage-3 six-section prompts
    ├─ audio_segments/            segment WAV, one per segment
    ├─ storyboards/               pass-1 output
@@ -62,7 +62,7 @@ It writes `<projects_dir>/<name>-mv/`, copies every runner into `production/`, a
 - `tasks[].shot_mode` — `single_keyframe_camera` or `four_panel_multiframe`.
 - `tasks[].panel_cuts_seconds` — cut times for multi-frame segments, already mirrored into `[Shot k]`.
 
-After touching any asset run `fix_manifest_refs.py` to re-derive `images_in_order` from the `<Picture N>` tags and confirm nothing is missing.
+After touching any asset re-derive `images_in_order` from the pass-1 prompt files with `fix_manifest_refs.py` (it collects each segment's references, drops the segment key frame in first, then sorts scene → character → prop) and confirm nothing is missing.
 
 `production/lyrics/lyrics.json` drives stage 5 and is the only source of on-screen text. Start from `assets/lyrics.template.json`.
 
@@ -93,7 +93,7 @@ python run_krea2_img2img.py --denoise 0.35 <ids>   # pass 2, style
 python make_grids.py                         # 2x2 grid for multi-frame segments
 ```
 
-Pass 1 prompts must use `[图N]` labels, state the people count explicitly with a no-duplicate clause, list the features to keep, and ask for a 16:9 frame. Never pin a seed across segments.
+Pass 1 prompts must give `[图1]` the scene anchor — never a character, because the node sizes the output latent from the first reference and treats it as the edit base. Order the rest scene → character full body → head → prop, keep the prompt a short placement instruction with one scale reference, state the people count with a no-duplicate clause, express exclusions in positive wording (the negative prompt is inert at `cfg` 1), and ask for a 16:9 frame. Keep every reference at the same 16:9 aspect. Never pin a seed across segments.
 
 `make_grids.py` holds the multi-frame segment list for the current project; edit that list in the project copy, not in the skill copy.
 
